@@ -78,6 +78,14 @@ set(GLideN64_SOURCES
   DepthBufferRender/ClipPolygon.cpp
   DepthBufferRender/DepthBufferRender.cpp
   common/CommonAPIImpl_common.cpp
+  native/FileClass.cpp
+  native/GlSettings.cpp
+  native/IniFileClass.cpp
+  native/Native.cpp
+  native/NativeSettings.cpp
+  native/util/util.cpp
+  native/util/path.cpp
+  native/util/StdString.cpp
   Graphics/Context.cpp
   Graphics/ColorBufferReader.cpp
   Graphics/CombinerProgram.cpp
@@ -157,25 +165,25 @@ set(GLideNUI_SOURCES
 
 set(OpenGL_GL_PREFERENCE GLVND)
 
-if(MUPENPLUSAPI_GLIDENUI OR NOT MUPENPLUSAPI)
-  set(CMAKE_AUTOMOC ON)
-  set(CMAKE_AUTORCC ON)
-  set(CMAKE_AUTOUIC ON)
-
-  find_package(Qt5 COMPONENTS Core Widgets Gui REQUIRED)
-  set(GLIDENUI_LIBRARIES
-      Qt5::Widgets Qt5::Core Qt5::Gui
-  )
-  if (MUPENPLUSAPI)
-    list(APPEND GLideNUI_SOURCES
-      GLideNUI/fullscreenresolutions_mupen64plus.cpp
-    )
-  else()
-    list(APPEND GLideNUI_SOURCES
-      GLideNUI/fullscreenresolutions_windows.cpp
-    )
-  endif()
-endif()
+#if(MUPENPLUSAPI_GLIDENUI OR NOT MUPENPLUSAPI)
+#  set(CMAKE_AUTOMOC ON)
+#  set(CMAKE_AUTORCC ON)
+#  set(CMAKE_AUTOUIC ON)
+#
+#  find_package(Qt5 COMPONENTS Core Widgets Gui REQUIRED)
+#  set(GLIDENUI_LIBRARIES
+#      Qt5::Widgets Qt5::Core Qt5::Gui
+#  )
+#  if (MUPENPLUSAPI)
+#    list(APPEND GLideNUI_SOURCES
+#      GLideNUI/fullscreenresolutions_mupen64plus.cpp
+#    )
+#  else()
+#    list(APPEND GLideNUI_SOURCES
+#      GLideNUI/fullscreenresolutions_windows.cpp
+#    )
+#  endif()
+#endif()
 
 # Build type
 
@@ -219,6 +227,13 @@ else(EXISTS "${CMAKE_FIND_ROOT_PATH}/opt/vc/include/bcm_host.h" AND NOT MESA)
   set(EGL_LIB -lEGL)
 endif(EXISTS "${CMAKE_FIND_ROOT_PATH}/opt/vc/include/bcm_host.h" AND NOT MESA)
 
+set(GLideN64_SOURCES_UNIX
+  Graphics/OpenGLContext/linux/windows_DisplayWindow.cpp
+  Graphics/OpenGLContext/linux/WindowsWGL.cpp
+  linux/CommonAPIImpl_linux.cpp
+  windows/ScreenShot.cpp
+)
+
 if(MUPENPLUSAPI)
   add_definitions(
 	-DMUPENPLUSAPI
@@ -230,17 +245,13 @@ if(MUPENPLUSAPI)
 	mupenplus/CommonAPIImpl_mupenplus.cpp
 	mupenplus/MemoryStatus_mupenplus.cpp
 	mupenplus/MupenPlusAPIImpl.cpp
-	Graphics/OpenGLContext/mupen64plus/mupen64plus_DisplayWindow.cpp
+#	Graphics/OpenGLContext/mupen64plus/mupen64plus_DisplayWindow.cpp
   )
 
   if(MUPENPLUSAPI_GLIDENUI)
       add_definitions(-DM64P_GLIDENUI)
       list(APPEND GLideN64_SOURCES_UNIX
         ${GLideNUI_SOURCES}
-      )
-  else()
-      list(APPEND GLideN64_SOURCES_UNIX
-        mupenplus/Config_mupenplus.cpp
       )
   endif()
 
@@ -252,20 +263,20 @@ if(MUPENPLUSAPI)
       set(GLideN64_DLL_NAME mupen64plus-video-GLideN64)
   endif()
 else(MUPENPLUSAPI)
-  if(UNIX)
-    message(FATAL_ERROR "UNIX build requires MUPENPLUSAPI!")
-  endif(UNIX)
+  #if(UNIX)
+  #  message(FATAL_ERROR "UNIX build requires MUPENPLUSAPI!")
+  #endif(UNIX)
   include_directories( . inc )
   set(GLideN64_SOURCES_WIN
 	ZilmarPluginAPI.cpp
 	GLideNUI/Config_GLideNUI.cpp
 	windows/CommonAPIImpl_windows.cpp
-	windows/GLideN64_windows.cpp
+#	windows/GLideN64_windows.cpp
 	windows/MemoryStatus_windows.cpp
 	windows/ZilmarAPIImpl_windows.cpp
   windows/ScreenShot.cpp
-	Graphics/OpenGLContext/windows/windows_DisplayWindow.cpp
-  Graphics/OpenGLContext/windows/WindowsWGL.cpp
+	Graphics/OpenGLContext/linux/windows_DisplayWindow.cpp
+  Graphics/OpenGLContext/linux/WindowsWGL.cpp
   ${GLideNUI_SOURCES}
   )
   set(GLideN64_DLL_NAME GLideN64)
@@ -274,14 +285,14 @@ endif(MUPENPLUSAPI)
 add_subdirectory( osal )
 include_directories( osal )
 
-if (NOHQ)
-  list(APPEND GLideN64_SOURCES
-    TxFilterStub.cpp
-  )
-else (NOHQ)
+#if (NOHQ)
+#  list(APPEND GLideN64_SOURCES
+#    TxFilterStub.cpp
+#  )
+#else (NOHQ)
   add_subdirectory( GLideNHQ )
   include_directories( GLideNHQ )
-endif(NOHQ)
+#endif(NOHQ)
 
 if(UNIX)
   list(APPEND GLideN64_SOURCES ${GLideN64_SOURCES_UNIX})
@@ -295,6 +306,8 @@ if(UNIX)
   elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	add_definitions(
 	  -DOS_LINUX
+    -DNATIVE
+    -DGL_USE_UNIFORMBLOCK
 	)
   endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 endif(UNIX)
@@ -593,4 +606,5 @@ if(UNIX AND NOT APPLE AND NOT ANDROID)
 	install(FILES ../ini/${PROJECT_NAME}.custom.ini
 		DESTINATION "${CMAKE_INSTALL_DATADIR}/mupen64plus"
 	)
+  set_target_properties(${GLideN64_DLL_NAME} PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
 endif(UNIX AND NOT APPLE AND NOT ANDROID)

@@ -35,7 +35,7 @@ extern "C" {
   #define CALL		__cdecl
 #else
   #define EXPORT 	__attribute__((visibility("default")))
-  #define CALL          _cdecl
+  //#define CALL          _cdecl
 #endif
 
 /***** Structures *****/
