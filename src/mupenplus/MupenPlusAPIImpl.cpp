@@ -96,12 +96,14 @@ m64p_error PluginAPI::PluginStartup(m64p_dynlib_handle _CoreLibHandle)
 
 #ifndef M64P_GLIDENUI
 	if (Config_SetDefault()) {
+#ifndef OS_LINUX
 		config.version = ConfigGetParamInt(g_configVideoGliden64, "configVersion");
 		if (config.version != CONFIG_VERSION_CURRENT) {
 			ConfigDeleteSection("Video-GLideN64");
 			ConfigSaveFile();
 			Config_SetDefault();
 		}
+#endif
 	}
 #endif // M64P_GLIDENUI
 

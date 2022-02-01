@@ -22,6 +22,7 @@
 #include "Performance.h"
 #include "DisplayWindow.h"
 #include <Graphics/Context.h>
+#include <cstdio>
 
 #ifdef NATIVE
 #define RDRAM ((u8*)0)
@@ -690,7 +691,7 @@ void gDPLoadBlock(u32 tile, u32 uls, u32 ult, u32 lrs, u32 dxt)
 	word address = gDP.textureImage.address + ult * gDP.textureImage.bpl + (uls << gDP.textureImage.size >> 1);
 
 #ifdef NATIVE
-	if(address == 0 || address == 0xCDCDCDCD)
+	if(address == 0 || address == 0xCDCDCDCD || address == 0x08000000)
 	{
 		return;
 	}

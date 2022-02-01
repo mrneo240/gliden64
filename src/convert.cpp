@@ -1,5 +1,6 @@
 #include "convert.h"
 #include <string.h>
+#include <cstdio>
 
 const volatile unsigned char Five2Eight[32] =
 {
@@ -103,7 +104,7 @@ const volatile unsigned char One2Eight[2] =
 void UnswapCopyWrap(const u8 *src, word srcIdx, u8 *dest, word destIdx, word destMask, word numBytes)
 {
 #ifdef NATIVE
-    memcpy(dest + destIdx, src + srcIdx, numBytes);
+    memcpy(dest + destIdx, (const void*)((uintptr_t)src + srcIdx), numBytes);
 #else
 	// copy leading bytes
 	word leadingBytes = srcIdx & 3;
