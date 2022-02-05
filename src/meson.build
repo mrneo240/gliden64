@@ -7,6 +7,9 @@ if not meson.is_subproject()
   add_global_arguments('-m32', language : ['c', 'cpp'])
 endif
 arg_linker = [ '-m32' ]
+args_platform = []
+arg_options = []
+gliden64_sources_platform = []
 
 if build_os == 'linux' or build_os == 'darwin'
   script_extension = '.sh'
@@ -36,14 +39,16 @@ gliden64_sources = ['3DMath.cpp', 'Combiner.cpp', 'CombinerKey.cpp', 'CommonPlug
 
 # Build type
 gliden64_dll_name = 'GLideN64'
-if get_option('buildtype') == 'debug'
+if get_option('buildtype') == 'debug' or not get_option('NO_ASSERT')
   gliden64_dll_name = 'GLideN64d'
+  args_platform += [ '-UNDEBUG', '-DDEBUG' ]
+  message('Building Debug version of GLideN64')
 else
-  #
+  args_platform += [ '-UDEBUG', '-DNDEBUG' ]
+  message('Building Release version of GLideN64')
 endif
 gliden64_sources_unix = ['Graphics/OpenGLContext/linux/windows_DisplayWindow.cpp', 'Graphics/OpenGLContext/linux/WindowsWGL.cpp', 'linux/CommonAPIImpl_linux.cpp', 'windows/ScreenShot.cpp']
 gliden64_sources_win = [ 'windows/CommonAPIImpl_windows.cpp', 'windows/MemoryStatus_windows.cpp',  'windows/ScreenShot.cpp', 'Graphics/OpenGLContext/windows/windows_DisplayWindow.cpp', 'Graphics/OpenGLContext/windows/WindowsWGL.cpp', 'windows/GLideN64_windows.cpp']
-
 
 # Subdir projects
 subdir('osal')
@@ -51,9 +56,6 @@ subdir('osal')
 
 # platform specific files
 message('target_os = ' + target_os)
-args_platform = []
-arg_options = []
-gliden64_sources_platform = []
 if target_os == 'linux' or target_os == 'darwin'
   gliden64_sources += gliden64_sources_unix
   args_platform += [ '-DOS_LINUX', '-DNATIVE', '-DGL_USE_UNIFORMBLOCK' ]
