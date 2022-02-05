@@ -77,9 +77,10 @@ endif
 #  args_platform += [ '-DVERO4K' ]
 #endif
 
-freetype2_dep = dependency('freetype2')
-sdl2_dep = dependency('sdl2')
-libpng_dep = dependency('libpng')
+freetype2_dep = dependency('freetype2', native: false)
+sdl2_dep = dependency('sdl2', native: false)
+libpng_dep = dependency('libpng', native: false)
+zlib_dep = dependency('zlib', fallback : ['zlib', 'zlib_dep'], native: false)
 args_deps = ['-DUSE_SDL', '-DUSE_FREETYPE']
 
 if get_option('VEC4_OPT')
@@ -115,7 +116,7 @@ endif
 
 glidne64_dll = shared_library(gliden64_dll_name, sources: [ gliden64_sources, gliden64_sources_platform, revision_h ] , include_directories : '',
   cpp_args : [ arg_options, args_platform] , link_args : arg_linker,
-  dependencies : [sdl2_dep, freetype2_dep, libpng_dep, libosal_dep],
+  dependencies : [sdl2_dep, freetype2_dep, libpng_dep, zlib_dep, libosal_dep],
   name_prefix: '',
   install : true)
 
