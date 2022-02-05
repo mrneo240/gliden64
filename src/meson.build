@@ -39,14 +39,15 @@ gliden64_sources = ['3DMath.cpp', 'Combiner.cpp', 'CombinerKey.cpp', 'CommonPlug
 
 # Build type
 gliden64_dll_name = 'GLideN64'
-if get_option('buildtype') == 'debug' or not get_option('NO_ASSERT')
+if (get_option('NO_ASSERT')) or (get_option('buildtype') == 'release')
+  args_platform += [ '-UDEBUG', '-DNDEBUG' ]
+  message('Building Release version of GLideN64')
+else
   gliden64_dll_name = 'GLideN64d'
   args_platform += [ '-UNDEBUG', '-DDEBUG' ]
   message('Building Debug version of GLideN64')
-else
-  args_platform += [ '-UDEBUG', '-DNDEBUG' ]
-  message('Building Release version of GLideN64')
 endif
+
 gliden64_sources_unix = ['Graphics/OpenGLContext/linux/windows_DisplayWindow.cpp', 'Graphics/OpenGLContext/linux/WindowsWGL.cpp', 'linux/CommonAPIImpl_linux.cpp', 'windows/ScreenShot.cpp']
 gliden64_sources_win = [ 'windows/CommonAPIImpl_windows.cpp', 'windows/MemoryStatus_windows.cpp',  'windows/ScreenShot.cpp', 'Graphics/OpenGLContext/windows/windows_DisplayWindow.cpp', 'Graphics/OpenGLContext/windows/WindowsWGL.cpp', 'windows/GLideN64_windows.cpp']
 
