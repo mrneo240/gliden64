@@ -10,7 +10,8 @@ u64 TMEM[512];
 u8 *RDRAM;
 #endif
 
-word RDRAMSize = 0;
+//word RDRAMSize = 0;
+word RDRAMSize = 0x7FFFFF; //@Note: mrneo240
 
 N64Regs REG;
 

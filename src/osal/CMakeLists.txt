@@ -50,6 +50,8 @@ endif()
 
 if( GLIDEN64_BUILD_TYPE STREQUAL "Debug")
   add_library( osald STATIC ${OSAL_SOURCES})
+  set_target_properties(osald PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
 else( GLIDEN64_BUILD_TYPE STREQUAL "Debug")
   add_library( osal STATIC ${OSAL_SOURCES})
+  set_target_properties(osal PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
 endif( GLIDEN64_BUILD_TYPE STREQUAL "Debug")

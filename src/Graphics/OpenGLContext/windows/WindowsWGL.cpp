@@ -4,6 +4,10 @@
 #include <GLideN64.h>
 #include <Graphics/OpenGLContext/GLFunctions.h>
 
+__declspec(dllexport) void WindowsWGL_GrabWindow(void *wind) {
+	/* nothing */
+}
+
 HGLRC WindowsWGL::hRC = NULL;
 HDC WindowsWGL::hDC = NULL;
 

@@ -29,6 +29,7 @@ void APIENTRY on_gl_error(GLenum source,
 
 void GLInfo::init() {
 	const char * strDriverVersion = reinterpret_cast<const char *>(glGetString(GL_VERSION));
+	printf("VER: %s\n", strDriverVersion);
 	isGLESX = strstr(strDriverVersion, "OpenGL ES") != nullptr;
 	isGLES2 = strstr(strDriverVersion, "OpenGL ES 2") != nullptr;
 	if (isGLES2) {

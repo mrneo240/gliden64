@@ -257,16 +257,8 @@ copy /Y "$(OutDir)$(TargetName).*" "$(Mupen64PluginsDir_x64)")</Command>
     <ClCompile Include="..\..\src\Graphics\OpenGLContext\ThreadedOpenGl\opengl_Command.cpp" />
     <ClCompile Include="..\..\src\Graphics\OpenGLContext\ThreadedOpenGl\opengl_ObjectPool.cpp" />
     <ClCompile Include="..\..\src\Graphics\OpenGLContext\ThreadedOpenGl\RingBufferPool.cpp" />
-    <ClCompile Include="..\..\src\Graphics\OpenGLContext\windows\windows_DisplayWindow.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)'=='Debug_mupenplus' Or '$(Configuration)'=='Release_mupenplus'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_mupenplus|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_mupenplus|Win32'">false</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Graphics\OpenGLContext\windows\WindowsWGL.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)'=='Debug_mupenplus' Or '$(Configuration)'=='Release_mupenplus'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_mupenplus|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_mupenplus|Win32'">false</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="..\..\src\Graphics\OpenGLContext\windows\windows_DisplayWindow.cpp" />
+    <ClCompile Include="..\..\src\Graphics\OpenGLContext\windows\WindowsWGL.cpp" />
     <ClCompile Include="..\..\src\gSP.cpp" />
     <ClCompile Include="..\..\src\iob.cpp">
       <ExcludedFromBuild Condition="'$(Platform)'=='Win32'">true</ExcludedFromBuild>

@@ -1,4 +1,3 @@
-#include <windows/GLideN64_windows.h>
 #include <GLideN64.h>
 #include <Config.h>
 #include <N64.h>
@@ -9,6 +8,11 @@
 #include <DisplayWindow.h>
 #include <windows/ScreenShot.h>
 #include <Graphics/OpenGLContext/ThreadedOpenGl/opengl_Wrapper.h>
+
+
+bool isMemoryWritable(void * ptr, size_t byteCount) {
+	return true;
+}
 
 using namespace opengl;
 
@@ -114,103 +118,15 @@ void DisplayWindowWindows::_saveBufferContent(graphics::ObjectHandle _fbo, Cache
 
 void DisplayWindowWindows::_changeWindow()
 {
-	static LONG		windowedStyle;
-	static LONG		windowedExStyle;
-	static RECT		windowedRect;
-	static HMENU	windowedMenu;
-
-	if (!m_bFullscreen) {
-		DEVMODE fullscreenMode;
-		memset( &fullscreenMode, 0, sizeof(DEVMODE) );
-		fullscreenMode.dmSize = sizeof(DEVMODE);
-		fullscreenMode.dmPelsWidth = config.video.fullscreenWidth;
-		fullscreenMode.dmPelsHeight = config.video.fullscreenHeight;
-		fullscreenMode.dmBitsPerPel = 32;
-		fullscreenMode.dmDisplayFrequency = config.video.fullscreenRefresh;
-		fullscreenMode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT | DM_DISPLAYFREQUENCY;
-
-		if (ChangeDisplaySettings( &fullscreenMode, CDS_FULLSCREEN ) != DISP_CHANGE_SUCCESSFUL) {
-			MessageBoxW( NULL, L"Failed to change display mode", pluginNameW, MB_ICONERROR | MB_OK );
-			return;
-		}
-
-		ShowCursor( FALSE );
-
-		windowedMenu = GetMenu( hWnd );
-
-		if (windowedMenu)
-			SetMenu( hWnd, NULL );
-
-		if (hStatusBar)
-			ShowWindow( hStatusBar, SW_HIDE );
-
-		windowedExStyle = GetWindowLong( hWnd, GWL_EXSTYLE );
-		windowedStyle = GetWindowLong( hWnd, GWL_STYLE );
-
-		SetWindowLong( hWnd, GWL_EXSTYLE, WS_EX_APPWINDOW | WS_EX_TOPMOST );
-		SetWindowLong( hWnd, GWL_STYLE, WS_POPUP );
-
-		GetWindowRect( hWnd, &windowedRect );
-
-		m_bFullscreen = true;
-		_resizeWindow();
-	} else {
-		ChangeDisplaySettings( NULL, 0 );
-
-		ShowCursor( TRUE );
-
-		if (windowedMenu)
-			SetMenu( hWnd, windowedMenu );
-
-		if (hStatusBar)
-			ShowWindow( hStatusBar, SW_SHOW );
-
-		SetWindowLong( hWnd, GWL_STYLE, windowedStyle );
-		SetWindowLong( hWnd, GWL_EXSTYLE, windowedExStyle );
-		SetWindowPos( hWnd, NULL, windowedRect.left, windowedRect.top, 0, 0, SWP_NOZORDER | SWP_NOSIZE );
-
-		m_bFullscreen = false;
-		_resizeWindow();
-	}
+	_resizeWindow();
 }
 
 bool DisplayWindowWindows::_resizeWindow()
 {
-	RECT windowRect, statusRect, toolRect;
-
-	windowRect = statusRect = toolRect = { 0 };
-
-	if (m_bFullscreen) {
-		m_screenWidth = config.video.fullscreenWidth;
-		m_screenHeight = config.video.fullscreenHeight;
-		m_heightOffset = 0;
-		_setBufferSize();
-
-		return true;
-		return (SetWindowPos(hWnd, NULL, 0, 0, m_screenWidth, m_screenHeight, SWP_NOACTIVATE | SWP_NOZORDER | SWP_SHOWWINDOW) == TRUE);
-	} else {
-		m_screenWidth = m_width = config.video.windowedWidth;
-		m_screenHeight = config.video.windowedHeight;
-		_setBufferSize();
-
-		GetClientRect( hWnd, &windowRect );
-
-		if (hStatusBar)
-			GetWindowRect( hStatusBar, &statusRect );
-
-		if (hToolBar)
-			GetWindowRect( hToolBar, &toolRect );
-
-		m_heightOffset = (statusRect.bottom - statusRect.top);
-		windowRect.right = windowRect.left + config.video.windowedWidth - 1;
-		windowRect.bottom = windowRect.top + config.video.windowedHeight - 1 + m_heightOffset;
-
-		return true;
-		AdjustWindowRect( &windowRect, GetWindowLong( hWnd, GWL_STYLE ), GetMenu( hWnd ) != NULL );
-
-		return (SetWindowPos( hWnd, NULL, 0, 0, windowRect.right - windowRect.left + 1,
-			windowRect.bottom - windowRect.top + 1 + toolRect.bottom - toolRect.top + 1, SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOMOVE ) == TRUE);
-	}
+	m_screenWidth = m_width = config.video.windowedWidth;
+	m_screenHeight = config.video.windowedHeight;
+	_setBufferSize();
+	return true;
 }
 
 void DisplayWindowWindows::_readScreen(void **_pDest, long *_pWidth, long *_pHeight)

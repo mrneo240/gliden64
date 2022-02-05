@@ -8,7 +8,7 @@
 #include "Config.h"
 #include "DisplayWindow.h"
 #include <wchar.h>
-#include "settings.h"
+#include "Settings.h"
 
 #define START_WIDTH 1280
 #define START_HEIGHT 720
@@ -16,13 +16,19 @@
 static u64 g_width = START_WIDTH;
 static u64 g_height = START_HEIGHT;
 
+#if defined(OS_WINDOWS)
+#define DLL_EXPORT __declspec(dllexport)
+#else
+#define DLL_EXPORT
+#endif
+
 extern "C" {
-    u64 gfx_width()
+    DLL_EXPORT u64 gfx_width()
     {
         return g_width;
     }
 
-    u64 gfx_height()
+    DLL_EXPORT u64 gfx_height()
     {
         return g_height;
     }
@@ -90,7 +96,7 @@ N64Regs::~N64Regs() {
 
 extern "C"
 {
-    void gfx_resize(long width, long height)
+    DLL_EXPORT void gfx_resize(long width, long height)
     {
         g_width = width;
         g_height = height;
@@ -102,12 +108,15 @@ extern "C"
 }
 
 void _CheckInterrupts() {
+	(void)gfx_resize;
+	(void)gfx_width;
+	(void)gfx_height;
 }
 
 
 
 extern "C" {
-    void gfx_init(const char* romName, OSViMode* viMode) {
+    DLL_EXPORT void gfx_init(const char* romName, OSViMode* viMode) {
         REG.VI_STATUS = &viMode->comRegs.ctrl;
         REG.VI_WIDTH = &viMode->comRegs.width;
         REG.VI_TIMING = &viMode->comRegs.burst;
@@ -135,15 +144,14 @@ extern "C" {
 
         config.frameBufferEmulation.enable = 0;
         config.frameBufferEmulation.aspect = Config::aAdjust;
-        
     }
 
-    void gfx_shutdown() {
+    DLL_EXPORT void gfx_shutdown() {
         RDRAMSize = 0;
         api().RomClosed();
     }
 
-    void gfx_run(OSTask_t* task, u32 sz) {
+    DLL_EXPORT void gfx_run(OSTask_t* task, u32 sz) {
         if(sizeof(OSTask_t) != sz)
         {
             return;
@@ -178,6 +186,12 @@ void Config_DoConfig(/*HWND hParent*/)
 
 void LoadConfig(const wchar_t* _strFileName)
 {
+#if defined(OS_LINUX)
+    std::wstring wStrFile(_strFileName);
+    std::string IniFolder(wStrFile.begin(), wStrFile.end());
+    loadSettings(IniFolder.c_str());
+    return;
+#else
     std::string IniFolder;
     uint32_t slength = WideCharToMultiByte(CP_ACP, 0, _strFileName, -1, NULL, 0, NULL, NULL);
     IniFolder.resize(slength);
@@ -185,10 +199,17 @@ void LoadConfig(const wchar_t* _strFileName)
     IniFolder.resize(slength - 1); //Remove null end char
 
     loadSettings(IniFolder.c_str());
+#endif
 }
 
 void LoadCustomRomSettings(const wchar_t* _strFileName, const char* _romName)
 {
+#if defined(OS_LINUX)
+    std::wstring wStrFile(_strFileName);
+    std::string IniFolder(wStrFile.begin(), wStrFile.end());
+    loadCustomRomSettings(IniFolder.c_str(), _romName);
+    return;
+#else
     std::string IniFolder;
     uint32_t slength = WideCharToMultiByte(CP_ACP, 0, _strFileName, -1, NULL, 0, NULL, NULL);
     IniFolder.resize(slength);
@@ -196,6 +217,7 @@ void LoadCustomRomSettings(const wchar_t* _strFileName, const char* _romName)
     IniFolder.resize(slength - 1); //Remove null end char
 
     loadCustomRomSettings(IniFolder.c_str(), _romName);
+#endif
 }
 
 void Config_LoadConfig()

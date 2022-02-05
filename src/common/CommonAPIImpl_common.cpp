@@ -240,7 +240,7 @@ void PluginAPI::UpdateScreen()
 
 void PluginAPI::_initiateGFX(const GFX_INFO & _gfxInfo) const {
 #ifndef NATIVE
-    HEADER = _gfxInfo.HEADER;
+	HEADER = _gfxInfo.HEADER;
 	DMEM = _gfxInfo.DMEM;
 	IMEM = _gfxInfo.IMEM;
 	RDRAM = _gfxInfo.RDRAM;

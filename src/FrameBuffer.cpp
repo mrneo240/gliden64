@@ -28,7 +28,6 @@
 #include <Graphics/ColorBufferReader.h>
 #include "DisplayWindow.h"
 
-using namespace std;
 using namespace graphics;
 
 FrameBuffer::FrameBuffer()
@@ -188,8 +187,8 @@ void FrameBuffer::init(u32 _address, u16 _format, u16 _size, u16 _width, bool _c
 
 void FrameBuffer::updateEndAddress()
 {
-	const u32 height = max(1U, m_height);
-	m_endAddress = min(RDRAMSize, m_startAddress + (((m_width * height) << m_size >> 1) - 1));
+	const u32 height = std::max(1U, m_height);
+	m_endAddress = std::min(RDRAMSize, m_startAddress + (((m_width * height) << m_size >> 1) - 1));
 }
 
 inline
@@ -232,7 +231,7 @@ void FrameBuffer::copyRdram()
 		// This is necessary for auxilary buffers: game can restore content of RDRAM when buffer is not needed anymore
 		// Thus content of RDRAM on moment of buffer creation will be the same as when buffer becomes obsolete.
 		// Validity check will see that the RDRAM is the same and thus the buffer is valid, which is false.
-		const u32 twoPercent = max(4U, dataSize / 200);
+		const u32 twoPercent = std::max(4U, dataSize / 200);
 		u32 start = m_startAddress >> 2;
 		u32 * pData = reinterpret_cast<u32*>(RDRAM);
 		for (u32 i = 0; i < twoPercent; ++i) {
@@ -661,13 +660,13 @@ void FrameBufferList::destroy() {
 void FrameBufferList::setBufferChanged(f32 _maxY)
 {
 	gDP.colorImage.changed = TRUE;
-	gDP.colorImage.height = max(gDP.colorImage.height, static_cast<u32>(_maxY));
-	gDP.colorImage.height = min(gDP.colorImage.height, static_cast<u32>(gDP.scissor.lry));
+	gDP.colorImage.height = std::max(gDP.colorImage.height, static_cast<u32>(_maxY));
+	gDP.colorImage.height = std::min(gDP.colorImage.height, static_cast<u32>(gDP.scissor.lry));
 	if (m_pCurrent != nullptr) {
 		if (m_pCurrent->m_isMainBuffer)
-			m_pCurrent->m_height = max(m_pCurrent->m_height, min(gDP.colorImage.height, VI.height));
+			m_pCurrent->m_height = std::max(m_pCurrent->m_height, std::min(gDP.colorImage.height, VI.height));
 		else
-			m_pCurrent->m_height = max(m_pCurrent->m_height, gDP.colorImage.height);
+			m_pCurrent->m_height = std::max(m_pCurrent->m_height, gDP.colorImage.height);
 		m_pCurrent->m_cfb = false;
 		m_pCurrent->m_changed = true;
 		m_pCurrent->m_copiedToRdram = false;
@@ -1527,11 +1526,11 @@ void FrameBufferList::renderBuffer()
 		XoffsetRight = XoffsetLeft = 0;
 	}
 
-	srcWidth = static_cast<s32>(min(rdpRes.vi_width, (rdpRes.vi_hres * rdpRes.vi_x_add) >> 10));
+	srcWidth = static_cast<s32>(std::min(rdpRes.vi_width, (rdpRes.vi_hres * rdpRes.vi_x_add) >> 10));
 	srcHeight = static_cast<s32>(rdpRes.vi_width * ((rdpRes.vi_vres*rdpRes.vi_y_add + rdpRes.vi_y_start) >> 10) / pBuffer->m_width);
 
 	const u32 stride = pBuffer->m_width << pBuffer->m_size >> 1;
-	FrameBuffer *pNextBuffer = findBuffer(rdpRes.vi_origin + stride * min(u32(srcHeight) - 1, pBuffer->m_height - 1) - 1);
+	FrameBuffer *pNextBuffer = findBuffer(rdpRes.vi_origin + stride * std::min(u32(srcHeight) - 1, pBuffer->m_height - 1) - 1);
 	if (pNextBuffer == pBuffer)
 		pNextBuffer = nullptr;
 
@@ -1555,7 +1554,7 @@ void FrameBufferList::renderBuffer()
 	const s32 hx0 = static_cast<s32>(rdpRes.vi_h_start + rdpRes.vi_minhpass);
 	const s32 h0 = (rdpRes.vi_ispal ? 128 : 108);
 	const s32 hEnd = _SHIFTR(*REG.VI_H_START, 0, 10);
-	const s32 hx1 = max(0, h0 + 640 - hEnd + static_cast<s32>(rdpRes.vi_maxhpass));
+	const s32 hx1 = std::max(0, h0 + 640 - hEnd + static_cast<s32>(rdpRes.vi_maxhpass));
 	//const s32 hx1 = hx0 + rdpRes.vi_hres;
 	dstX0 = static_cast<s32>((hx0 * viScaleX + f32(XoffsetRight)) * dstScaleX);
 	dstX1 = static_cast<s32>(m_overscan.getDrawingWidth()) - static_cast<s32>(hx1 * viScaleX * dstScaleX);
@@ -1567,7 +1566,7 @@ void FrameBufferList::renderBuffer()
 	s32 srcCoord[4] = { static_cast<s32>((XoffsetLeft) * srcScaleX) + cutleft,
 						static_cast<s32>(srcY0*srcScaleY),
 						static_cast<s32>((srcWidth + XoffsetLeft - XoffsetRight) * srcScaleX) - cutright,
-						min(static_cast<s32>(srcY1*srcScaleY), static_cast<s32>(pBufferTexture->height)) };
+						std::min(static_cast<s32>(srcY1*srcScaleY), static_cast<s32>(pBufferTexture->height)) };
 	if (srcCoord[2] > pBufferTexture->width || srcCoord[3] > pBufferTexture->height) {
 		removeBuffer(pBuffer->m_startAddress);
 		return;
@@ -1648,7 +1647,7 @@ void FrameBufferList::renderBuffer()
 		}
 
 		blitParams.srcY0 = 0;
-		blitParams.srcY1 = min(static_cast<s32>(srcY1*srcScaleY), static_cast<s32>(pFilteredBuffer->m_pTexture->height));
+		blitParams.srcY1 = std::min(static_cast<s32>(srcY1*srcScaleY), static_cast<s32>(pFilteredBuffer->m_pTexture->height));
 		blitParams.srcWidth = pBufferTexture->width;
 		blitParams.srcHeight = pBufferTexture->height;
 		blitParams.dstY0 = vOffset + static_cast<s32>(dstY0*dstScaleY);
@@ -1692,10 +1691,10 @@ void FrameBufferList::fillRDRAM(s32 ulx, s32 uly, s32 lrx, s32 lry)
 		// Do not write to RDRAM color buffer if copyFromRDRAM enabled.
 		return;
 
-	ulx = static_cast<s32>(min(max(static_cast<f32>(ulx), gDP.scissor.ulx), gDP.scissor.lrx));
-	lrx = static_cast<s32>(min(max(static_cast<f32>(lrx), gDP.scissor.ulx), gDP.scissor.lrx));
-	uly = static_cast<s32>(min(max(static_cast<f32>(uly), gDP.scissor.uly), gDP.scissor.lry));
-	lry = static_cast<s32>(min(max(static_cast<f32>(lry), gDP.scissor.uly), gDP.scissor.lry));
+	ulx = static_cast<s32>(std::min(std::max(static_cast<f32>(ulx), gDP.scissor.ulx), gDP.scissor.lrx));
+	lrx = static_cast<s32>(std::min(std::max(static_cast<f32>(lrx), gDP.scissor.ulx), gDP.scissor.lrx));
+	uly = static_cast<s32>(std::min(std::max(static_cast<f32>(uly), gDP.scissor.uly), gDP.scissor.lry));
+	lry = static_cast<s32>(std::min(std::max(static_cast<f32>(lry), gDP.scissor.uly), gDP.scissor.lry));
 
 	const u32 stride = gDP.colorImage.width << gDP.colorImage.size >> 1;
 	const u32 lowerBound = gDP.colorImage.address + static_cast<u32>(lry)*stride;

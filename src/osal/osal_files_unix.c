@@ -22,6 +22,7 @@
 /* This file contains the definitions for the unix-specific file handling
  * functions
  */
+#define _XOPEN_SOURCE 700
 
 #include <dirent.h>
 #include <stdio.h>

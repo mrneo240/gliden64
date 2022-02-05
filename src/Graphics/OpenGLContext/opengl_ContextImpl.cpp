@@ -45,6 +45,7 @@ ContextImpl::~ContextImpl()
 
 void ContextImpl::init()
 {
+	initGLFunctions();
 	m_clampMode = graphics::ClampMode::ClippingEnabled;
 	m_glInfo.init();
 

@@ -4,7 +4,15 @@
 #ifdef MUPENPLUSAPI
 #include "m64p_plugin.h"
 #else
+#if defined(OS_LINUX)
+#define BOOL bool
+#define WORD unsigned int
+#undef CALL
+#define CALL
+#define HWND void*
+#else
 #include "windows/GLideN64_windows.h"
+#endif
 #include "ZilmarGFX_1_3.h"
 #include "FrameBufferInfoAPI.h"
 //#define RSPTHREAD

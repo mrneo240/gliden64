@@ -94,6 +94,7 @@ u8 ASCIItoHID(const char * pStr) {
 
 bool Config_SetDefault()
 {
+	#if 0
 	if (ConfigOpenSection("Video-General", &g_configVideoGeneral) != M64ERR_SUCCESS) {
 		LOG(LOG_ERROR, "Unable to open Video-General configuration section");
 		g_configVideoGeneral = nullptr;
@@ -215,7 +216,7 @@ bool Config_SetDefault()
 	res = ConfigSetDefaultBool(g_configVideoGliden64, "EnableOverscan", config.frameBufferEmulation.enableOverscan, "Enable resulted image crop by Overscan.");
 	assert(res == M64ERR_SUCCESS);
 	res = ConfigSetDefaultInt(g_configVideoGliden64, "OverscanPalLeft", config.frameBufferEmulation.overscanPAL.left, "PAL mode. Left bound of Overscan.");
-	assert(res == M64ERR_SUCCESS);
+	assert(res == M64ERRloadSettings_SUCCESS);
 	res = ConfigSetDefaultInt(g_configVideoGliden64, "OverscanPalRight", config.frameBufferEmulation.overscanPAL.right, "PAL mode. Right bound of Overscan.");
 	assert(res == M64ERR_SUCCESS);
 	res = ConfigSetDefaultInt(g_configVideoGliden64, "OverscanPalTop", config.frameBufferEmulation.overscanPAL.top, "PAL mode. Top bound of Overscan.");
@@ -316,8 +317,11 @@ bool Config_SetDefault()
 #endif
 
 	return ConfigSaveSection("Video-GLideN64") == M64ERR_SUCCESS;
+#endif
+return true;
 }
 
+#if 0
 void Config_LoadCustomConfig()
 {
 	if (ConfigExternalGetParameter == nullptr || ConfigExternalOpen == nullptr || ConfigExternalClose == nullptr)
@@ -619,3 +623,4 @@ void Config_LoadConfig()
 
 	config.validate();
 }
+#endif
