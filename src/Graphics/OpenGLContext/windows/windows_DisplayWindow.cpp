@@ -1,4 +1,4 @@
-#include <windows/GLideN64_Windows.h>
+#include <windows/GLideN64_windows.h>
 #include <GLideN64.h>
 #include <Config.h>
 #include <N64.h>
@@ -78,7 +78,13 @@ void DisplayWindowWindows::_saveScreenshot()
 			gfxContext.bindFramebuffer(graphics::bufferTarget::READ_FRAMEBUFFER, pBuffer->m_FBO);
 	}
 	glReadBuffer(oldMode);
-	SaveScreenshot(m_strScreenDirectory, RSP.romname, m_screenWidth, m_screenHeight, pixelData);
+
+	size_t size = (wcslen(m_strScreenDirectory) + 1) * sizeof(wchar_t);
+	char *cBuf = new char[size];
+	std::wcstombs(cBuf, m_strScreenDirectory, size);
+
+	SaveScreenshot(cBuf, RSP.romname, m_screenWidth, m_screenHeight, pixelData);
+	delete cBuf;
 	free( pixelData );
 }
 
@@ -96,7 +102,13 @@ void DisplayWindowWindows::_saveBufferContent(graphics::ObjectHandle _fbo, Cache
 			gfxContext.bindFramebuffer(graphics::bufferTarget::READ_FRAMEBUFFER, pCurrentBuffer->m_FBO);
 	}
 	glReadBuffer(oldMode);
-	SaveScreenshot(m_strScreenDirectory, RSP.romname, _pTexture->width, _pTexture->height, pixelData);
+
+	size_t size = (wcslen(m_strScreenDirectory) + 1) * sizeof(wchar_t);
+	char *cBuf = new char[size];
+	std::wcstombs(cBuf, m_strScreenDirectory, size);
+
+	SaveScreenshot(cBuf, RSP.romname, _pTexture->width, _pTexture->height, pixelData);
+	delete cBuf;
 	free(pixelData);
 }
 

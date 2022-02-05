@@ -3,7 +3,7 @@
 #include <cstring>
 #include <algorithm>
 #ifdef _WIN32
-#include <Windows.h>
+#include <windows.h>
 #else
 #define _vscprintf(foo, ...) vsnprintf(NULL, 0, foo, __VA_ARGS__)
 #define _snprintf snprintf

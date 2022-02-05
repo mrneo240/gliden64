@@ -254,8 +254,10 @@ void gSPDMAMatrix( u32 matrix, u8 index, u8 multiply )
 		mtx[3][0], mtx[3][1], mtx[3][2], mtx[3][3] );
 }
 
-extern "C" u64 gfx_width();
-extern "C" u64 gfx_height();
+extern "C" {
+ 	u64 gfx_width(void);
+	u64 gfx_height(void);
+};
 
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240

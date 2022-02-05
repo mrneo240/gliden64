@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef _WIN32
 #include <cstring>
+#ifndef _WIN32
 #define _stricmp strcasecmp
 #define stricmp strcasecmp
 #define sprintf_s snprintf

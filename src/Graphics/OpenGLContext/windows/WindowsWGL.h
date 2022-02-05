@@ -1,9 +1,9 @@
 #pragma once
 #include <stdio.h>
 #include <windows.h>
-#include <GL/GL.h>
+#include <GL/gl.h>
 #include <GL/wglext.h>
-#include <windows/GLideN64_Windows.h>
+#include <windows/GLideN64_windows.h>
 
 class WindowsWGL
 {

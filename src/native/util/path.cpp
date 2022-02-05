@@ -3,11 +3,11 @@
 //////////////////////////////////////////////////////////////////////
 #include "path.h"
 #ifdef _WIN32
-#include <Shlobj.h>
+#include <shlobj.h>
 #include <dos.h>
 #pragma warning(push)
 #pragma warning(disable : 4996) // warning C4091: 'typedef ': ignored on left of 'tagGPFIDL_FLAGS' when no variable is declared
-#include <CommDlg.h>
+#include <commdlg.h>
 #pragma warning(pop)
 #else
 #include <sys/stat.h>
@@ -875,15 +875,18 @@ void CPath::UpDirectory(std::string *pLastDirectory /*= NULL*/)
 //-------------------------------------------------------------
 void CPath::CurrentDirectory()
 {
+#ifdef _WIN32
     char buff_path[260];
     memset(buff_path, 0, sizeof(buff_path));
 
     Empty();
-
-#ifdef _WIN32
-    ::GetCurrentDirectory(sizeof(buff_path), buff_path);
+    ::GetCurrentDirectoryA(sizeof(buff_path), buff_path);
     SetDriveDirectory(buff_path);
 #else
+    char buff_path[260];
+    memset(buff_path, 0, sizeof(buff_path));
+
+    Empty();
     getcwd(buff_path, sizeof(buff_path));
     SetDirectory(buff_path);
 #endif
@@ -1256,8 +1259,8 @@ bool CPath::FindFirst(uint32_t dwAttributes /*= FIND_ATTRIBUTE_FILES*/)
     BOOL bWantSubdirectory = (BOOL)(FIND_ATTRIBUTE_SUBDIR & dwAttributes);
 
     // i.) Finding first candidate file
-    WIN32_FIND_DATA	FindData;
-    m_hFindFile = FindFirstFile(m_strPath.c_str(), &FindData);
+    WIN32_FIND_DATAA	FindData;
+    m_hFindFile = FindFirstFileA(m_strPath.c_str(), &FindData);
     bGotFile = (m_hFindFile != INVALID_HANDLE_VALUE);
 
     while (bGotFile)

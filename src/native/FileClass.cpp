@@ -2,7 +2,7 @@
 #ifdef _WIN32
 #include <io.h>
 #define USE_WINDOWS_API
-#include <Windows.h>
+#include <windows.h>
 #else
 #include <unistd.h>
 #include <cstring>

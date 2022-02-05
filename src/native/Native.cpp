@@ -16,13 +16,19 @@
 static u64 g_width = START_WIDTH;
 static u64 g_height = START_HEIGHT;
 
+#if defined(OS_WINDOWS)
+#define DLL_EXPORT __declspec(dllexport)
+#else
+#define DLL_EXPORT
+#endif
+
 extern "C" {
-    u64 gfx_width()
+    DLL_EXPORT u64 gfx_width()
     {
         return g_width;
     }
 
-    u64 gfx_height()
+    DLL_EXPORT u64 gfx_height()
     {
         return g_height;
     }
@@ -90,7 +96,7 @@ N64Regs::~N64Regs() {
 
 extern "C"
 {
-    void gfx_resize(long width, long height)
+    DLL_EXPORT void gfx_resize(long width, long height)
     {
         g_width = width;
         g_height = height;
@@ -110,7 +116,7 @@ void _CheckInterrupts() {
 
 
 extern "C" {
-    void gfx_init(const char* romName, OSViMode* viMode) {
+    DLL_EXPORT void gfx_init(const char* romName, OSViMode* viMode) {
         REG.VI_STATUS = &viMode->comRegs.ctrl;
         REG.VI_WIDTH = &viMode->comRegs.width;
         REG.VI_TIMING = &viMode->comRegs.burst;
@@ -138,15 +144,14 @@ extern "C" {
 
         config.frameBufferEmulation.enable = 0;
         config.frameBufferEmulation.aspect = Config::aAdjust;
-        
     }
 
-    void gfx_shutdown() {
+    DLL_EXPORT void gfx_shutdown() {
         RDRAMSize = 0;
         api().RomClosed();
     }
 
-    void gfx_run(OSTask_t* task, u32 sz) {
+    DLL_EXPORT void gfx_run(OSTask_t* task, u32 sz) {
         if(sizeof(OSTask_t) != sz)
         {
             return;

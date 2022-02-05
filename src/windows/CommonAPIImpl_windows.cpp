@@ -1,6 +1,6 @@
 #include <algorithm>
 #include <string>
-#include "GLideN64_Windows.h"
+#include "GLideN64_windows.h"
 #include <commctrl.h>
 #include "../PluginAPI.h"
 #include "../RSP.h"

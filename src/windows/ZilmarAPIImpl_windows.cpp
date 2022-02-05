@@ -1,4 +1,4 @@
-#include "GLideN64_Windows.h"
+#include "GLideN64_windows.h"
 #include "../PluginAPI.h"
 #include "../GLideN64.h"
 #include "../GLideNUI/GLideNUI.h"

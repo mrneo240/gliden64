@@ -1,15 +1,16 @@
 # Platform config
 target_os = target_machine.system()
+build_os = build_machine.system()
 
 # 32 bit
 if not meson.is_subproject()
   add_global_arguments('-m32', language : ['c', 'cpp'])
 endif
-arg_linker = [ '-m32', '-lGL' ]
+arg_linker = [ '-m32' ]
 
-if target_os == 'linux' or target_os == 'darwin'
+if build_os == 'linux' or build_os == 'darwin'
   script_extension = '.sh'
-elif target_os == 'windows'
+elif build_os == 'windows'
   script_extension = '.bat'
 endif
 
@@ -41,7 +42,7 @@ else
   #
 endif
 gliden64_sources_unix = ['Graphics/OpenGLContext/linux/windows_DisplayWindow.cpp', 'Graphics/OpenGLContext/linux/WindowsWGL.cpp', 'linux/CommonAPIImpl_linux.cpp', 'windows/ScreenShot.cpp']
-gliden64_sources_win = [ 'windows/CommonAPIImpl_windows.cpp', 'windows/MemoryStatus_windows.cpp',  'windows/ScreenShot.cpp', 'Graphics/OpenGLContext/linux/windows_DisplayWindow.cpp', 'Graphics/OpenGLContext/linux/WindowsWGL.cpp']
+gliden64_sources_win = [ 'windows/CommonAPIImpl_windows.cpp', 'windows/MemoryStatus_windows.cpp',  'windows/ScreenShot.cpp', 'Graphics/OpenGLContext/windows/windows_DisplayWindow.cpp', 'Graphics/OpenGLContext/windows/WindowsWGL.cpp', 'windows/GLideN64_windows.cpp']
 
 
 # Subdir projects
@@ -56,9 +57,11 @@ gliden64_sources_platform = []
 if target_os == 'linux' or target_os == 'darwin'
   gliden64_sources += gliden64_sources_unix
   args_platform += [ '-DOS_LINUX', '-DNATIVE', '-DGL_USE_UNIFORMBLOCK' ]
+  arg_linker += [ '-lGL' ]
 elif target_os == 'windows'
   gliden64_sources += gliden64_sources_win
-  args_platform += [ '-DOS_WINDOWS', '-D__WIN32__', '-DWIN32', '-D_WIN32_ASM', '-D_CRT_SECURE_NO_WARNINGS', '-D__MSC__' ]
+  args_platform += [ '-DOS_WINDOWS', '-D__WIN32__', '-DWIN32', '-D_WIN32_ASM', '-D_CRT_SECURE_NO_WARNINGS', '-D__MSC__', '-DNATIVE', '-DGL_USE_UNIFORMBLOCK']
+  arg_linker += [ '-lopengl32' ]
 endif
 #if 'PANDORA'
 #  #Pandora as a SGX530, but it should share the bugs and limitations as SGX540

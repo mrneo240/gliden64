@@ -15,8 +15,8 @@
 #include <GL/gl.h>
 
 static SDL_Window *_wind = NULL;
-void WindowsWGL_GrabWindow(SDL_Window *wind) {
-	_wind = wind;
+void WindowsWGL_GrabWindow(void *wind) {
+	_wind = (SDL_Window*)wind;
 }
 
 bool WindowsWGL::start()

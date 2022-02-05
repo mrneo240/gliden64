@@ -1,6 +1,6 @@
 #include "IniFileClass.h"
-#include <stdlib.h>
-#include <stdarg.h>
+#include <cstdlib>
+#include <cstdarg>
 
 #pragma warning(disable:4996)
 

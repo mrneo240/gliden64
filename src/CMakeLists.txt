@@ -335,7 +335,7 @@ endif(WIN32)
 
 if(SDL)
   include(FindPkgConfig)
-  pkg_check_modules(SDL REQUIRED sdl)
+  pkg_check_modules(SDL2 REQUIRED sdl2)
   include_directories(${SDL_INCLUDE_DIRS})
   add_definitions(
 	-DUSE_SDL

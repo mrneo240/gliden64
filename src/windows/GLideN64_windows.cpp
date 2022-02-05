@@ -1,4 +1,4 @@
-#include "GLideN64_Windows.h"
+#include "GLideN64_windows.h"
 
 HWND		hWnd;
 HWND		hStatusBar;
