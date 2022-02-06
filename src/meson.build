@@ -60,7 +60,7 @@ message('target_os = ' + target_os)
 if target_os == 'linux' or target_os == 'darwin'
   gliden64_sources += gliden64_sources_unix
   args_platform += [ '-DOS_LINUX', '-DNATIVE', '-DGL_USE_UNIFORMBLOCK' ]
-  arg_linker += [ '-lGL' ]
+  arg_linker += [ '-lGL', '-pthread' ]
 elif target_os == 'windows'
   gliden64_sources += gliden64_sources_win
   args_platform += [ '-DOS_WINDOWS', '-D__WIN32__', '-DWIN32', '-D_WIN32_ASM', '-D_CRT_SECURE_NO_WARNINGS', '-D__MSC__', '-DNATIVE', '-DGL_USE_UNIFORMBLOCK']
@@ -80,8 +80,8 @@ endif
 thread_dep = dependency('threads', native: false)
 freetype2_dep = dependency('freetype2', native: false)
 sdl2_dep = dependency('sdl2', native: false)
-libpng_dep = dependency('libpng', native: false)
-zlib_dep = dependency('zlib', fallback : ['zlib', 'zlib_dep'], native: false)
+libpng_dep = dependency('libpng', fallback : ['libpng', 'libpng_dep'], native: false, default_options: ['default_library=static'])
+zlib_dep = dependency('zlib', fallback : ['zlib', 'zlib_dep'], native: false, default_options: ['default_library=static'])
 args_deps = ['-DUSE_SDL', '-DUSE_FREETYPE']
 
 if get_option('VEC4_OPT')
