@@ -10,8 +10,13 @@
 #include <unistd.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#if defined(__MINGW32__) || defined(USE_SDL2_INCLUDE_PATH_SHORT)
+#include <SDL.h>
+#include <SDL_opengl.h>
+#else
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
+#endif
 #include <GL/gl.h>
 
 static SDL_Window *_wind = NULL;

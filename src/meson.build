@@ -57,6 +57,28 @@ else
   message('Building Debug version of GLideN64')
 endif
 
+# Compiler detection
+args_sdl = []
+sdl_include_path_full = '''#include<SDL2/SDL.h>
+void func() { SDL_Init(0); }
+'''
+sdl_include_path_short = '''#include<SDL.h>
+void func() { SDL_Init(0); }
+'''
+cc = meson.get_compiler('c')
+result_sdl_path_long = cc.compiles( sdl_include_path_full, name : 'sdl_include_long', dependencies : [ sdl2_dep ] )
+if result_sdl_path_long
+  message('Using SDL2 include path <SDL2/SDL.h>')
+else
+  result_sdl_path_short = cc.compiles( sdl_include_path_short, name : 'sdl_include_short', dependencies : [ sdl2_dep ] )
+  if result_sdl_path_short
+    args_platform += [ '-DUSE_SDL2_INCLUDE_PATH_SHORT' ]
+    message('Using SDL2 include path  <SDL.h>')
+  else
+    error('Could not find SDL2 include path')
+  endif
+endif
+
 gliden64_sources_unix = ['Graphics/OpenGLContext/linux/windows_DisplayWindow.cpp', 'Graphics/OpenGLContext/linux/WindowsWGL.cpp', 'linux/CommonAPIImpl_linux.cpp', 'windows/ScreenShot.cpp']
 gliden64_sources_win = [ 'windows/CommonAPIImpl_windows.cpp', 'windows/MemoryStatus_windows.cpp',  'windows/ScreenShot.cpp', 'Graphics/OpenGLContext/windows/windows_DisplayWindow.cpp', 'Graphics/OpenGLContext/windows/WindowsWGL.cpp', 'windows/GLideN64_windows.cpp']
 gliden64_includes = include_directories('.')
@@ -73,7 +95,6 @@ if target_os == 'linux' or target_os == 'darwin'
   gliden64_sources += gliden64_sources_unix
   args_platform += [ '-DOS_LINUX', '-DNATIVE', '-DGL_USE_UNIFORMBLOCK' ]
   arg_linker += [ '-pthread' ]
-  cc = meson.get_compiler('c')
   dl_dep = cc.find_library('dl')
   gliden64_deps += dl_dep
 elif target_os == 'windows'
