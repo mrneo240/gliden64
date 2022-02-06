@@ -2,6 +2,8 @@
 target_os = target_machine.system()
 platform_flags = []
 osal_sources = []
+osal_includes = include_directories('.')
+
 if target_os == 'linux'
   osal_sources = [ 'osal_files_unix.c', 'osal_keys_linux.c' ]
   platform_flags += [ '-DOS_LINUX', '-DNDEBUG' ]
@@ -20,4 +22,4 @@ else
   osal_lib = static_library('osal', osal_sources)
 endif
 
-libosal_dep = declare_dependency(include_directories : '.', link_with : osal_lib)
+libosal_dep = declare_dependency(include_directories : osal_includes, link_with : osal_lib)

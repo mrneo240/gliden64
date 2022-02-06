@@ -11,6 +11,15 @@ args_platform = []
 arg_options = []
 gliden64_sources_platform = []
 
+opengl_dep = dependency('gl')
+thread_dep = dependency('threads', native: false)
+freetype2_dep = dependency('freetype2', native: false)
+sdl2_dep = dependency('sdl2', native: false)
+libpng_dep = dependency('libpng', fallback : ['libpng', 'libpng_dep'], native: false, default_options: ['default_library=static'])
+zlib_dep = dependency('zlib', fallback : ['zlib', 'zlib_dep'], native: false, default_options: ['default_library=static'])
+gliden64_deps = [ sdl2_dep, freetype2_dep, libpng_dep, zlib_dep, thread_dep, opengl_dep ]
+args_deps = ['-DUSE_SDL', '-DUSE_FREETYPE']
+
 if build_os == 'linux' or build_os == 'darwin'
   script_extension = '.sh'
 elif build_os == 'windows'
@@ -50,21 +59,27 @@ endif
 
 gliden64_sources_unix = ['Graphics/OpenGLContext/linux/windows_DisplayWindow.cpp', 'Graphics/OpenGLContext/linux/WindowsWGL.cpp', 'linux/CommonAPIImpl_linux.cpp', 'windows/ScreenShot.cpp']
 gliden64_sources_win = [ 'windows/CommonAPIImpl_windows.cpp', 'windows/MemoryStatus_windows.cpp',  'windows/ScreenShot.cpp', 'Graphics/OpenGLContext/windows/windows_DisplayWindow.cpp', 'Graphics/OpenGLContext/windows/WindowsWGL.cpp', 'windows/GLideN64_windows.cpp']
+gliden64_includes = include_directories('.')
 
 # Subdir projects
 subdir('osal')
-#subdir('GLideNHQ')
+subdir('GLideNHQ')
+
+gliden64_deps += [ libosal_dep ]
 
 # platform specific files
 message('target_os = ' + target_os)
 if target_os == 'linux' or target_os == 'darwin'
   gliden64_sources += gliden64_sources_unix
   args_platform += [ '-DOS_LINUX', '-DNATIVE', '-DGL_USE_UNIFORMBLOCK' ]
-  arg_linker += [ '-lGL', '-pthread' ]
+  arg_linker += [ '-pthread' ]
+  cc = meson.get_compiler('c')
+  dl_dep = cc.find_library('dl')
+  gliden64_deps += dl_dep
 elif target_os == 'windows'
   gliden64_sources += gliden64_sources_win
   args_platform += [ '-DOS_WINDOWS', '-D__WIN32__', '-DWIN32', '-D_WIN32_ASM', '-D_CRT_SECURE_NO_WARNINGS', '-D__MSC__', '-DNATIVE', '-DGL_USE_UNIFORMBLOCK']
-  arg_linker += [ '-lopengl32' ]
+  #arg_linker += [ '-lopengl32' ]
 endif
 #if 'PANDORA'
 #  #Pandora as a SGX530, but it should share the bugs and limitations as SGX540
@@ -76,13 +91,6 @@ endif
 #if 'VERO4K'
 #  args_platform += [ '-DVERO4K' ]
 #endif
-
-thread_dep = dependency('threads', native: false)
-freetype2_dep = dependency('freetype2', native: false)
-sdl2_dep = dependency('sdl2', native: false)
-libpng_dep = dependency('libpng', fallback : ['libpng', 'libpng_dep'], native: false, default_options: ['default_library=static'])
-zlib_dep = dependency('zlib', fallback : ['zlib', 'zlib_dep'], native: false, default_options: ['default_library=static'])
-args_deps = ['-DUSE_SDL', '-DUSE_FREETYPE']
 
 if get_option('VEC4_OPT')
   arg_options += [ '-D__VEC4_OPT' ]
@@ -104,7 +112,12 @@ else
   gliden64_sources_platform += [ '3DMath.cpp', 'RSP_LoadMatrix.cpp' ]
 endif
 
-gliden64_sources_platform += [ 'TxFilterStub.cpp' ]
+if get_option('NOHQ')
+  gliden64_sources_platform += [ 'TxFilterStub.cpp' ]
+else
+  # not sure
+  gliden64_deps += [ glidenhq_dep ]
+endif
 
 if get_option('GL_PROFILE')
   arg_options += [ '-DGL_PROFILE', '-DGL_DEBUG' ]
@@ -115,9 +128,9 @@ endif
 #  opengl_libraries = egl_lib
 #endif
 
-glidne64_dll = shared_library(gliden64_dll_name, sources: [ gliden64_sources, gliden64_sources_platform, revision_h ] , include_directories : '',
+glidne64_dll = shared_library(gliden64_dll_name, sources: [ gliden64_sources, gliden64_sources_platform, revision_h ] , include_directories : gliden64_includes,
   cpp_args : [ arg_options, args_platform] , link_args : arg_linker,
-  dependencies : [sdl2_dep, freetype2_dep, libpng_dep, zlib_dep, thread_dep, libosal_dep],
+  dependencies : gliden64_deps,
   name_prefix: '',
   install : true)
 
