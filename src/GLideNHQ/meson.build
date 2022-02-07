@@ -23,11 +23,14 @@ elif target_os == 'windows'
 endif
 
 # Build type
+glidenhq_name = 'GLideNHQ'
 if get_option('buildtype') == 'debug'
-  glidenhq_lib = static_library('GLideNHQd', glidenhq_sources, include_directories : [ osal_includes, gliden64_includes, glidenhq_includes ] )
-else
-  glidenhq_lib = static_library('GLideNHQ', glidenhq_sources, include_directories : [ osal_includes, gliden64_includes, glidenhq_includes ] )
+  glidenhq_name += 'd'
 endif
+
+glidenhq_lib = static_library('GLideNHQd', glidenhq_sources,
+  include_directories : [ osal_includes, gliden64_includes, glidenhq_includes ],
+  cpp_args : [ args_platform ] )
 
 libpng_dep = dependency('libpng', fallback : ['libpng', 'libpng_dep'], native: false, default_options: ['default_library=static'])
 zlib_dep = dependency('zlib', fallback : ['zlib', 'zlib_dep'], native: false, default_options: ['default_library=static'])

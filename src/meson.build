@@ -13,10 +13,10 @@ gliden64_sources_platform = []
 
 opengl_dep = dependency('gl')
 thread_dep = dependency('threads', native: false)
-freetype2_dep = dependency('freetype2', native: false)
+freetype2_dep = dependency('freetype2', native: false, default_options: ['default_library=static', 'png=disabled', 'zlib=disabled'])
 sdl2_dep = dependency('sdl2', native: false)
 libpng_dep = dependency('libpng', fallback : ['libpng', 'libpng_dep'], native: false, default_options: ['default_library=static'])
-zlib_dep = dependency('zlib', fallback : ['zlib', 'zlib_dep'], native: false, default_options: ['default_library=static'])
+zlib_dep = dependency('zlib', fallback : ['zlib', 'zlib_dep'], native: false, default_options: ['default_library=static', 'solo=true'])
 gliden64_deps = [ sdl2_dep, freetype2_dep, libpng_dep, zlib_dep, thread_dep, opengl_dep ]
 args_deps = ['-DUSE_SDL', '-DUSE_FREETYPE']
 
@@ -58,26 +58,33 @@ else
 endif
 
 # Compiler detection
-args_sdl = []
-sdl_include_path_full = '''#include<SDL2/SDL.h>
-void func() { SDL_Init(0); }
-'''
-sdl_include_path_short = '''#include<SDL.h>
-void func() { SDL_Init(0); }
-'''
 cc = meson.get_compiler('c')
-result_sdl_path_long = cc.compiles( sdl_include_path_full, name : 'sdl_include_long', dependencies : [ sdl2_dep ] )
-if result_sdl_path_long
-  message('Using SDL2 include path <SDL2/SDL.h>')
+args_sdl = []
+sdl_include_path_full = '''#include <SDL2/SDL.h>
+void func() { SDL_Init(0); }
+'''
+sdl_include_path_short = '''#include <SDL.h>
+void func() { SDL_Init(0); }
+'''
+if sdl2_dep.type_name() == 'internal'
+  args_sdl += [ '-DUSE_SDL2_INCLUDE_PATH_SHORT' ]
+  message('Using SDL2 include path  <SDL.h>')
 else
-  result_sdl_path_short = cc.compiles( sdl_include_path_short, name : 'sdl_include_short', dependencies : [ sdl2_dep ] )
-  if result_sdl_path_short
-    args_platform += [ '-DUSE_SDL2_INCLUDE_PATH_SHORT' ]
-    message('Using SDL2 include path  <SDL.h>')
+  result_sdl_path_long = cc.compiles( sdl_include_path_full, name : 'sdl_include_long', dependencies : sdl2_dep )
+  if result_sdl_path_long
+    message('Using SDL2 include path <SDL2/SDL.h>')
   else
-    error('Could not find SDL2 include path')
+    result_sdl_path_short = cc.compiles( sdl_include_path_short, name : 'sdl_include_short', dependencies : sdl2_dep )
+    if result_sdl_path_short
+      args_sdl += [ '-DUSE_SDL2_INCLUDE_PATH_SHORT' ]
+      message('Using SDL2 include path  <SDL.h>')
+    else
+      error('Could not find SDL2 include path')
+    endif
   endif
 endif
+# Add what we learned to the platform args
+args_platform += args_sdl
 
 gliden64_sources_unix = ['Graphics/OpenGLContext/linux/windows_DisplayWindow.cpp', 'Graphics/OpenGLContext/linux/WindowsWGL.cpp', 'linux/CommonAPIImpl_linux.cpp', 'windows/ScreenShot.cpp']
 gliden64_sources_win = [ 'windows/CommonAPIImpl_windows.cpp', 'windows/MemoryStatus_windows.cpp',  'windows/ScreenShot.cpp', 'Graphics/OpenGLContext/windows/windows_DisplayWindow.cpp', 'Graphics/OpenGLContext/windows/WindowsWGL.cpp', 'windows/GLideN64_windows.cpp']
@@ -85,7 +92,6 @@ gliden64_includes = include_directories('.')
 
 # Subdir projects
 subdir('osal')
-subdir('GLideNHQ')
 
 gliden64_deps += [ libosal_dep ]
 
@@ -136,7 +142,8 @@ endif
 if get_option('NOHQ')
   gliden64_sources_platform += [ 'TxFilterStub.cpp' ]
 else
-  # not sure
+  message('Compiling GLideN64 with GLideNHQ support!')
+  subdir('GLideNHQ')
   gliden64_deps += [ glidenhq_dep ]
 endif
 
@@ -155,4 +162,4 @@ glidne64_dll = shared_library(gliden64_dll_name, sources: [ gliden64_sources, gl
   name_prefix: '',
   install : true)
 
-gliden64_dep = declare_dependency( link_with : glidne64_dll)
+gliden64_dep = declare_dependency( link_args : arg_linker, link_with : glidne64_dll )

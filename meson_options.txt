@@ -14,4 +14,4 @@ option('CRC_NEON', type : 'boolean', value : false, description : 'to turn on CR
 option('NEON_OPT', type : 'boolean', value : false, description : 'to turn on NEON Optimization')
 option('X86_OPT', type : 'boolean', value : false, description : 'to turn on X86 Optimization')
 option('NO_ASSERT', type : 'boolean', value : true, description : 'to turn off assert()')
-option('NOHQ', type : 'boolean', value : false, description : 'Disable using GLideNHQ')
+option('NOHQ', type : 'boolean', value : true, description : 'Disable using GLideNHQ')
