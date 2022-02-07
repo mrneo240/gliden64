@@ -87,7 +87,7 @@ private:
 	SortData m_SortFunction;
 
 	void fInsertSpaces(int Pos, int NoOfSpaces);
-	int GetStringFromFile(char * & String, std::unique_ptr<char> &Data, int & MaxDataSize, int & DataSize, int & ReadPos);
+	int GetStringFromFile(char * & String, std::unique_ptr<char[]> &Data, int & MaxDataSize, int & DataSize, int & ReadPos);
 	bool MoveToSectionNameData(const char * lpSectionName, bool ChangeCurrentSection);
 	const char * CleanLine(char * Line);
 	void ClearSectionPosList(long FilePos);

@@ -83,7 +83,7 @@ void CIniFileBase::fInsertSpaces(int Pos, int NoOfSpaces)
 	}
 }
 
-int CIniFileBase::GetStringFromFile(char * & String, std::unique_ptr<char> &Data, int & MaxDataSize, int & DataSize, int & ReadPos)
+int CIniFileBase::GetStringFromFile(char * & String, std::unique_ptr<char[]> &Data, int & MaxDataSize, int & DataSize, int & ReadPos)
 {
 	enum { BufferIncrease = 0x2000 };
 	if (MaxDataSize == 0)
@@ -171,7 +171,7 @@ void CIniFileBase::SaveCurrentSection(void)
 		m_File.Seek(0, CFileBase::end);
 
 		int len = (int)m_CurrentSection.length() + (lineFeedLen * 2) + 5;
-		std::unique_ptr<char> SectionName(new char[len]);
+		std::unique_ptr<char[]> SectionName(new char[len]);
 		if (m_File.GetLength() < (int)strlen(m_LineFeed))
 		{
 			sprintf(SectionName.get(), "[%s]%s", m_CurrentSection.c_str(), m_LineFeed);
@@ -189,7 +189,7 @@ void CIniFileBase::SaveCurrentSection(void)
 		//increase/decrease space needed
 		int NeededBufferLen = 0;
 		{
-			std::unique_ptr<char> LineData;
+			std::unique_ptr<char[]> LineData;
 			int len = 0;
 
 			for (KeyValueList::iterator iter = m_CurrentSectionData.begin(); iter != m_CurrentSectionData.end(); iter++)
@@ -209,7 +209,7 @@ void CIniFileBase::SaveCurrentSection(void)
 		m_File.Seek(m_CurrentSectionFilePos, CFileBase::begin);
 
 		int MaxDataSize = 0, DataSize = 0, ReadPos = 0, result;
-		std::unique_ptr<char> Data;
+		std::unique_ptr<char[]> Data;
 		char *Input = NULL;
 
 		//Skip first line as it is the section name
@@ -244,7 +244,7 @@ void CIniFileBase::SaveCurrentSection(void)
 	}
 
 	{
-		std::unique_ptr<char> LineData;
+		std::unique_ptr<char[]> LineData;
 		int len = 0;
 
 		if (m_SortFunction != NULL)
@@ -298,7 +298,7 @@ bool CIniFileBase::MoveToSectionNameData(const char * lpSectionName, bool Change
 		m_CurrentSection = "";
 	}
 
-	std::unique_ptr<char> Data;
+	std::unique_ptr<char[]> Data;
 	char *Input = NULL;
 	int MaxDataSize = 0, DataSize = 0, ReadPos = 0, result;
 
@@ -509,7 +509,7 @@ bool CIniFileBase::DeleteSection(const char * lpSectionName)
 
 	{
 		int MaxDataSize = 0, DataSize = 0, ReadPos = 0, NextLine = 0, result;
-		std::unique_ptr <char> Data;
+		std::unique_ptr <char[]> Data;
 		char *Input = NULL;
 		do
 		{
@@ -794,7 +794,7 @@ void CIniFileBase::GetKeyValueData(const char * lpSectionName, KeyValueData & Li
 	if (!MoveToSectionNameData(strSection.c_str(), false)) { return; }
 
 	int MaxDataSize = 0, DataSize = 0, ReadPos = 0, result;
-	std::unique_ptr <char> Data;
+	std::unique_ptr <char[]> Data;
 	char *Input = NULL;
 	do
 	{
