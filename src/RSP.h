@@ -42,7 +42,7 @@ word RSP_SegmentToPhysical(word segaddr);
 
 void RSP_Init(const char* romName = nullptr);
 
-void RSP_ProcessDList(void* displayList, word displayListLength, void* uc_start, void* uc_dstart, word uc_dsize, u32 matrixStackSize = 0, void* ZSortBOSS_pc = nullptr);
+void RSP_ProcessDList(void* displayList, word displayListLength, void* uc_start, word uc_size, void* uc_dstart, word uc_dsize, u32 matrixStackSize = 0, void* ZSortBOSS_pc = nullptr);
 void RSP_ProcessDList();
 
 

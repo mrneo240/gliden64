@@ -564,6 +564,7 @@ struct GBIInfo
 	GBIFunc cmd[256];
 
 	u32 PCStackSize;
+	u32 m_uc_size;
 
 	void init();
 	void destroy();

@@ -49,8 +49,8 @@ void _ProcessDList()
 #endif
 
 #ifdef NATIVE
-        RSP.words = *(Gwords*)(RSP.PC[RSP.PCi]);
-        RSP.cmd = _SHIFTR(RSP.words.w0, 24, 8);
+		RSP.words = *(Gwords*)(RSP.PC[RSP.PCi]);
+		RSP.cmd = _SHIFTR(RSP.words.w0, 24, 8);
 #else
 		RSP.words = *(Gwords*)&RDRAM[RSP.PC[RSP.PCi]];
 		RSP.cmd = _SHIFTR(RSP.words.w0, 24, 8);
@@ -119,7 +119,7 @@ void RSP_CheckDLCounter()
 	}
 }
 
-void RSP_ProcessDList(void* displayList, word displayListLength, void* uc_start, void* uc_dstart, word uc_dsize, u32 matrixStackSize, void* ZSortBOSS_pc)
+void RSP_ProcessDList(void* displayList, word displayListLength, void* uc_start, word uc_size, void* uc_dstart, word uc_dsize, u32 matrixStackSize, void* ZSortBOSS_pc)
 {
 	RSP.LLE = false;
 
@@ -170,8 +170,10 @@ void RSP_ProcessDList(void* displayList, word displayListLength, void* uc_start,
 		DebugMsg(DEBUG_NORMAL, "--- NEW DLIST --- ucode: %d, fbuf: %08lx, fbuf_width: %d, dlist start: %08lx, dlist_length: %d, x_scale: %f, y_scale: %f\n",
 			GBI.getMicrocodeType(), *REG.VI_ORIGIN, *REG.VI_WIDTH, dlist_start, dlist_length, (*REG.VI_X_SCALE & 0xFFF) / 1024.0f, (*REG.VI_Y_SCALE & 0xFFF) / 1024.0f);
 
-		if (((word)uc_start != RSP.uc_start) || ((word)uc_dstart != RSP.uc_dstart))
+		if (((word)uc_start != RSP.uc_start) || ((word)uc_dstart != RSP.uc_dstart)){
+			GBI.m_uc_size = uc_size;
 			gSPLoadUcodeEx((word)uc_start, (word)uc_dstart, uc_dsize);
+		}
 
 		depthBufferList().setCleared(false);
 
@@ -223,8 +225,8 @@ void RSP_ProcessDList(void* displayList, word displayListLength, void* uc_start,
 
 void RSP_ProcessDList() {
     RSP_ProcessDList((void*)*(word*)&DMEM[0x0FF0], *(word*)(DMEM + 0xFF4), (void*)*(word*)&DMEM[0x0FD0],
-                     (void*)*(word*)&DMEM[0x0FD8], *(word*)&DMEM[0x0FDC], *(u32*)&DMEM[0x0FE4],
-                     (void*)*(word*)&DMEM[0xff8]);
+                     *(word*)&DMEM[0x0FD4], (void*)*(word*)&DMEM[0x0FD8], *(word*)&DMEM[0x0FDC],
+                     *(u32*)&DMEM[0x0FE4], (void*)*(word*)&DMEM[0xff8]);
 }
 
 static

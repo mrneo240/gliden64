@@ -156,7 +156,7 @@ extern "C" {
         {
             return;
         }
-        RSP_ProcessDList(task->data_ptr, task->data_size, task->ucode_boot, task->ucode_data, task->ucode_size);
+        RSP_ProcessDList(task->data_ptr, task->data_size, task->ucode_boot, task->ucode_boot_size, task->ucode_data, task->ucode_data_size);
         api().UpdateScreen();
         //Sleep(30);
     }

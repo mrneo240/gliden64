@@ -153,6 +153,7 @@ void GBIInfo::init()
 {
 	m_hwlSupported = true;
 	m_pCurrent = nullptr;
+	m_uc_size = 0;
 	_flushCommands();
 }
 
@@ -365,10 +366,10 @@ void GBIInfo::loadMicrocode(word uc_start, word uc_dstart, u16 uc_dsize)
 
 	// See if we can identify it by CRC
 #ifdef NATIVE
-	const u32 uc_crc = CRC_Calculate_Strict( 0xFFFFFFFF, (void*)uc_start, 4096 );
+	if (m_uc_size == 0){ m_uc_size = 4096;}
+	const u32 uc_crc = CRC_Calculate_Strict( 0xFFFFFFFF, (void*)uc_start, m_uc_size );
 #else
-	const u32 uc_crc = CRC_Calculate_Strict( 0xFFFFFFFF, &RDRAM[uc_start & 0x1FFFFFFF], 4096 );
-#endif
+	const u32 uc_crc = CRC_Calculate_Strict( 0xFFFFFFFF, &RDRAM[uc_start & 0x1FFFFFFF], uc_dsize );
 	SpecialMicrocodeInfo infoToSearch;
 	infoToSearch.crc = uc_crc;
 	auto it = std::lower_bound(specialMicrocodes.begin(), specialMicrocodes.end(), infoToSearch,
@@ -383,6 +384,7 @@ void GBIInfo::loadMicrocode(word uc_start, word uc_dstart, u16 uc_dsize)
 		_makeCurrent(&current);
 		return;
 	}
+	#endif
 
 #ifdef NATIVE
 	const char* uc_data = (const char*)uc_dstart;
