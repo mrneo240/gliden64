@@ -15,3 +15,4 @@ option('NEON_OPT', type : 'boolean', value : false, description : 'to turn on NE
 option('X86_OPT', type : 'boolean', value : false, description : 'to turn on X86 Optimization')
 option('NO_ASSERT', type : 'boolean', value : true, description : 'to turn off assert()')
 option('NOHQ', type : 'boolean', value : true, description : 'Disable using GLideNHQ')
+option('x64', type : 'boolean', value : false, description : 'Build for x64 architecture', yield : true)

@@ -5,6 +5,7 @@
 
 void RSP_LoadMatrix( f32 mtx[4][4], word address )
 {
+#ifndef GBI_FLOATS
     struct _N64Matrix
     {
         s16 integer[4][4];
@@ -19,5 +20,8 @@ void RSP_LoadMatrix( f32 mtx[4][4], word address )
     for (u32 i = 0; i < 4; i++)
         for (u32 j = 0; j < 4; j++)
             mtx[i][j] = GetFloatMatrixElement(n64Mat->integer[i][j ^ ENDIAN_BIT_SWAP], n64Mat->fraction[i][j ^ ENDIAN_BIT_SWAP]);
+#endif
+#else
+    memcpy(mtx, &RDRAM[address], sizeof(f32[4][4]));
 #endif
 }

@@ -1645,6 +1645,7 @@ void gSPInsertMatrix( u32 where, u32 num )
 	} else
 		return;
 
+#ifndef GBI_FLOATS
 	const u16 * pData = reinterpret_cast<u16*>(&num);
 	const u32 index = (addr < 0x20) ? (addr >> 1) : ((addr - 0x20) >> 1);
 	for (u32 i = 0; i < 2; i++) {
@@ -1660,6 +1661,25 @@ void gSPInsertMatrix( u32 where, u32 num )
 			pMtx[index + i] = GetFloatMatrixElement(integer, fract);
 		}
 	}
+#else
+	/* Honestly, no idea need to read f3dzex2 gbi docs */
+	#if 0
+	const u32 index = (addr < 0x20) ? (addr >> 1) : ((addr - 0x20) >> 1);
+	for (u32 i = 0; i < 2; i++) {
+		if (addr < 0x20) {
+			// integer elements of the matrix to be changed
+			const s16 integer = static_cast<s16>(pData[i ^ 1]);
+			const u16 fract = GetIntMatrixElement(pMtx[index + i]).second;
+			pMtx[index + i] = GetFloatMatrixElement(integer, fract);
+		} else {
+			// fractional elements of the matrix to be changed
+			const s16 integer = GetIntMatrixElement(pMtx[index + i]).first;
+			const u16 fract = pData[i ^ 1];
+			pMtx[index + i] = GetFloatMatrixElement(integer, fract);
+		}
+	}
+	#endif
+#endif
 }
 
 void gSPModifyVertex( u32 _vtx, u32 _where, u32 _val )

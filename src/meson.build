@@ -3,12 +3,16 @@ target_os = target_machine.system()
 build_os = build_machine.system()
 
 # 32 bit
-if not meson.is_subproject()
-  add_global_arguments('-m32', language : ['c', 'cpp'])
+arch_bits = '-m32'
+if get_option('x64')
+  arch_bits = []
 endif
-arg_linker = [ '-m32' ]
+if not meson.is_subproject()
+  add_global_arguments(arch_bits, language : ['c', 'cpp'])
+endif
+arg_linker = [ arch_bits ]
 args_platform = []
-arg_options = []
+arg_options = ['-DGBI_FLOATS']
 gliden64_sources_platform = []
 
 opengl_dep = dependency('gl')
