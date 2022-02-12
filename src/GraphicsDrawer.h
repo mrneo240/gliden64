@@ -62,7 +62,8 @@ public:
 		float ulx, uly, lrx, lry;
 		float dsdx, dtdy;
 		s16 s, t;
-		bool flip, forceAjustScale, texrectCmd;
+		bool flip, forceAjustScale, texrectCmd, fixAspect;
+		f32 scaleIn;
 		const FrameBuffer * pBuffer;
 		TexturedRectParams(float _ulx, float _uly, float _lrx, float _lry,
 			float _dsdx, float _dtdy,

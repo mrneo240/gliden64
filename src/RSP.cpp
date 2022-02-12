@@ -64,7 +64,11 @@ void _ProcessDList()
 		auto pci = RSP.PCi;
 		if (RSP.count == 1)
 			--pci;
+#ifdef NATIVE
+		RSP.nextCmd = _SHIFTR(RSP.PC[pci], 24, 8);
+#else
 		RSP.nextCmd = _SHIFTR(*(word*)&RDRAM[RSP.PC[pci]], 24, 8);
+#endif
 
 		GBI.cmd[RSP.cmd](RSP.words);
 		RSP_CheckDLCounter();

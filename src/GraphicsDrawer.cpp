@@ -1269,6 +1269,14 @@ void GraphicsDrawer::drawTexturedRect(const TexturedRectParams & _params)
 	m_rect[3].z = Z;
 	m_rect[3].w = W;
 
+	if(_params.fixAspect){
+		const f32 x_diff = lrx-ulx;
+		m_rect[0].x = ulx+(x_diff*_params.scaleIn);
+		m_rect[1].x = lrx-(x_diff*_params.scaleIn);
+		m_rect[2].x = ulx+(x_diff*_params.scaleIn);
+		m_rect[3].x = lrx-(x_diff*_params.scaleIn);
+	}
+
 	struct
 	{
 		float s0, t0, s1, t1;

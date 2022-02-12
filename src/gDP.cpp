@@ -761,6 +761,7 @@ void gDPLoadTLUT( u32 tile, u32 uls, u32 ult, u32 lrs, u32 lrt )
 		return;
 	}
 	u16 count = static_cast<u16>((gDP.tiles[tile].lrs - gDP.tiles[tile].uls + 1) * (gDP.tiles[tile].lrt - gDP.tiles[tile].ult + 1));
+	/* Note: the count is quadrupled likely due to how palettes are stored in TMEM */
 	word address = gDP.textureImage.address + gDP.tiles[tile].ult * gDP.textureImage.bpl + (gDP.tiles[tile].uls << gDP.textureImage.size >> 1);
 	u16 pal = static_cast<u16>((gDP.tiles[tile].tmem - 256) >> 4);
 	u16 * dest = reinterpret_cast<u16*>(TMEM);
@@ -960,9 +961,30 @@ void gDPTextureRectangle(f32 ulx, f32 uly, f32 lrx, f32 lry, s32 tile, s16 s, s1
 		gDP.m_texCoordBounds.lrt = fmax(ult, lrt);
 	}
 
+#if defined(NATIVE)
+	bool needPillarBoxes = false;
+	DisplayWindow &wnd = dwnd();
+	const f32 wndW = wnd.getWidth();
+	const f32 wndH = wnd.getHeight();
+	const f32 wndAspect = wndW / wndH;
+	const f32 aspect43 = 4.0f / 3.0f;
+	const f32 x_diff = lrx-ulx;
+	const f32 ulx_orig = ulx;
+	const f32 lrx_orig = lrx;
+	f32 x_scale_in = 0;
+	if( fabs(x_diff - 320.0f) < 0.01f ){
+		x_scale_in = (1.0-(wndH*(aspect43)/wndW))/2.0f;
+		needPillarBoxes = true;
+	}
+#endif
+
 	GraphicsDrawer & drawer = dwnd().getDrawer();
 	GraphicsDrawer::TexturedRectParams params(ulx, uly, lrx, lry, dsdx, dtdy, s, t,
 		flip, false, true, frameBufferList().getCurrent());
+#if defined(NATIVE)
+	params.fixAspect = needPillarBoxes;
+	params.scaleIn = x_scale_in;
+#endif
 	if (config.graphics2D.enableNativeResTexrects == 0 && config.graphics2D.correctTexrectCoords != Config::tcDisable)
 		drawer.correctTexturedRectParams(params);
 	drawer.drawTexturedRect(params);
