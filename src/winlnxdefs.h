@@ -75,6 +75,8 @@ typedef const char 	*LPCSTR;
 //#define APIENTRY
 //#define EXPORT
 //#define CALL
+#undef CALL
+#define CALL
 
 #ifndef FALSE
 #define FALSE 0

@@ -974,7 +974,7 @@ void gDPTextureRectangle(f32 ulx, f32 uly, f32 lrx, f32 lry, s32 tile, s16 s, s1
 	f32 x_scale_in = 0;
 	if( fabs(x_diff - 320.0f) < 0.01f ){
 		x_scale_in = (1.0-(wndH*(aspect43)/wndW))/2.0f;
-		needPillarBoxes = true;
+		needPillarBoxes = false; /* Breaks pause menu but fixes shops :( */
 	}
 #endif
 
