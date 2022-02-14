@@ -256,6 +256,15 @@ extern "C" {
         config.frameBufferEmulation.enableOverscan = 1;
         config.generalEmulation.hacks |= hack_subscreen | hack_ZeldaMonochrome;
         config.textureFilter.txHiresEnable = 1;
+        wsprintf(config.textureFilter.txCachePath, L".");
+    }
+
+    bool gfx_is_highres_enabled() {
+        return config.textureFilter.txHiresEnable;
+    }
+
+    void gfx_highres_enable(bool enable) {
+        config.textureFilter.txHiresEnable = enable;
     }
 
     DLL_EXPORT void gfx_shutdown() {
