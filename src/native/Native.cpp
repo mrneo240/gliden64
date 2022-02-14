@@ -1,3 +1,7 @@
+/* SPDX-FileCopyrightText: 2022 Hayden Kowalchuk 819028+mrneo240@users.noreply.github.com */
+/* SPDX-License-Identifier: BSD-3-Clause */
+/* Note: The above applies to parts of this file modified by Hayden Kowalchuk only and not existing code */
+
 #include "PluginAPI.h"
 #include "N64.h"
 #include "RSP.h"
@@ -250,8 +254,8 @@ extern "C" {
         config.frameBufferEmulation.enable = 0;
         config.frameBufferEmulation.aspect = 2;
         config.frameBufferEmulation.enableOverscan = 1;
-        //config.frameBufferEmulation.nativeResFactor = 3;
-        config.generalEmulation.hacks |= hack_subscreen | hack_ZeldaMonochrome | hack_blurPauseScreen;
+        config.generalEmulation.hacks |= hack_subscreen | hack_ZeldaMonochrome;
+        config.textureFilter.txHiresEnable = 1;
     }
 
     DLL_EXPORT void gfx_shutdown() {
