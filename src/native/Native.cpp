@@ -21,6 +21,7 @@
 
 static u64 g_width  = START_WIDTH;
 static u64 g_height = START_HEIGHT;
+static bool highres_hts = true;
 
 #if defined(OS_WINDOWS)
 #define DLL_EXPORT __declspec(dllexport)
@@ -257,6 +258,12 @@ extern "C" {
         config.generalEmulation.hacks |= hack_subscreen | hack_ZeldaMonochrome;
         config.textureFilter.txHiresEnable = 1;
         wsprintf(config.textureFilter.txCachePath, L".");
+        config.textureFilter.txHiresTextureFileStorage = highres_hts ? 1 : 0;
+    }
+
+    void gfx_switch_to_htc(bool enable) {
+        highres_hts = !enable;
+        config.textureFilter.txHiresTextureFileStorage = enable ? 0 : 1;
     }
 
     bool gfx_is_highres_enabled() {
