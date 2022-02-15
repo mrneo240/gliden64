@@ -147,6 +147,13 @@ void _loadSettings(GlSettings & settings)
 	settings.beginGroup("debug");
 	config.debug.dumpMode = settings.value("dumpMode", config.debug.dumpMode).toInt();
 	settings.endGroup();
+
+	settings.beginGroup("hotkeys");
+	for (u32 idx = 0; idx < Config::HotKey::hkTotal; ++idx) {
+		config.hotkeys.keys[idx] = settings.value(Config::hotkeyIniName(idx), 0).toInt();
+		config.hotkeys.enabledKeys[idx] = config.hotkeys.keys[idx];
+	}
+	settings.endGroup();
 }
 
 void loadSettings(const char * _strIniFolder)
@@ -327,6 +334,12 @@ void writeSettings(const char * _strIniFolder)
 
 		settings.beginGroup("debug");
 		settings.setValue("dumpMode", config.debug.dumpMode);
+		settings.endGroup();
+
+		settings.beginGroup("hotkeys");
+		for (u32 idx = 0; idx < Config::HotKey::hkTotal; ++idx) {
+			settings.setValue(Config::hotkeyIniName(idx), config.hotkeys.enabledKeys[idx]);
+		}
 		settings.endGroup();
 
 		settings.endGroup();
