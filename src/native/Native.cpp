@@ -29,18 +29,6 @@ static bool highres_hts = true;
 #define DLL_EXPORT
 #endif
 
-extern "C" {
-    DLL_EXPORT u64 gfx_width()
-    {
-        return g_width;
-    }
-
-    DLL_EXPORT u64 gfx_height()
-    {
-        return g_height;
-    }
-}
-
 #ifdef WTL_UI
 void ConfigInit(void* hinst);
 void ConfigCleanup(void);
@@ -99,24 +87,11 @@ SP_STATUS = new u32;
 }
 
 N64Regs::~N64Regs() {
-}
-
-extern "C"
-{
-    DLL_EXPORT void gfx_resize(long width, long height)
-    {
-        g_width = width;
-        g_height = height;
-        config.video.windowedWidth = g_width;
-        config.video.windowedHeight = g_height;
-        dwnd().setWindowSize(g_width, g_height);
-    }
+    /* Nothing to do. */
 }
 
 void _CheckInterrupts() {
-	(void)gfx_resize;
-	(void)gfx_width;
-	(void)gfx_height;
+    /* Nothing to do. */
 }
 
 //Copied over from OOT - needs cleanup
@@ -223,8 +198,6 @@ typedef struct {
 #define R_UPDATE_RATE               SREG(30)
 //End of copy
 
-
-
 extern "C" {
     DLL_EXPORT void gfx_init(const char* romName, OSViMode* viMode) {
         REG.VI_STATUS = &viMode->comRegs.ctrl;
@@ -257,21 +230,46 @@ extern "C" {
         config.frameBufferEmulation.enableOverscan = 1;
         config.generalEmulation.hacks |= hack_subscreen | hack_ZeldaMonochrome;
         config.textureFilter.txHiresEnable = 1;
+#if defined(OS_WINDOWS)
         wsprintf(config.textureFilter.txCachePath, L".");
+#else
+        swprintf(config.textureFilter.txCachePath, 260, L".");
+#endif
         config.textureFilter.txHiresTextureFileStorage = highres_hts ? 1 : 0;
     }
 
-    void gfx_switch_to_htc(bool enable) {
-        highres_hts = !enable;
-        config.textureFilter.txHiresTextureFileStorage = enable ? 0 : 1;
+    DLL_EXPORT u64 gfx_width()
+    {
+        return g_width;
     }
 
-    bool gfx_is_highres_enabled() {
+    DLL_EXPORT u64 gfx_height()
+    {
+        return g_height;
+    }
+
+    DLL_EXPORT void gfx_resize(long width, long height)
+    {
+        g_width = width;
+        g_height = height;
+        config.video.windowedWidth = g_width;
+        config.video.windowedHeight = g_height;
+        dwnd().setWindowSize(g_width, g_height);
+    }
+
+    DLL_EXPORT void gfx_switch_to_htc(bool enable) {
+        highres_hts = !enable;
+        config.textureFilter.txHiresTextureFileStorage = enable ? 0 : 1;
+        textureCache().clear();
+    }
+
+    DLL_EXPORT bool gfx_is_highres_enabled() {
         return config.textureFilter.txHiresEnable;
     }
 
-    void gfx_highres_enable(bool enable) {
+    DLL_EXPORT void gfx_highres_enable(bool enable) {
         config.textureFilter.txHiresEnable = enable;
+        textureCache().clear();
     }
 
     DLL_EXPORT void gfx_shutdown() {
@@ -289,16 +287,16 @@ extern "C" {
         //Sleep(30);
     }
 
-    int gfx_fbe_is_enabled() {
+    DLL_EXPORT int gfx_fbe_is_enabled() {
         return config.frameBufferEmulation.enable;
     }
 
-    void gfx_fbe_enable(int enable) {
+    DLL_EXPORT void gfx_fbe_enable(int enable) {
         config.frameBufferEmulation.enable = enable;
         config.frameBufferEmulation.aspect = 3;
     }
 
-    void gfx_fbe_sync(GraphicsContext* gfxCtx, GameInfo* GameInfo) {
+    DLL_EXPORT void gfx_fbe_sync(GraphicsContext* gfxCtx, GameInfo* GameInfo) {
         if (!config.frameBufferEmulation.enable)
             return;
 
