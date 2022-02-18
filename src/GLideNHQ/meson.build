@@ -28,6 +28,8 @@ if get_option('buildtype') == 'debug'
   glidenhq_name += 'd'
 endif
 
+arg_base = [ '-DNATIVE', '-DRELATIVE_PATHS' ]
+
 glidenhq_lib = static_library('GLideNHQd', glidenhq_sources,
   include_directories : [ osal_includes, gliden64_includes, glidenhq_includes ],
   cpp_args : [ args_platform ] )

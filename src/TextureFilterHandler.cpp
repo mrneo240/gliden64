@@ -85,16 +85,18 @@ void TextureFilterHandler::init()
 
 	wchar_t txPath[PLUGIN_PATH_SIZE + 16];
 	wchar_t * pTexPackPath = config.textureFilter.txPath;
+#if defined(OS_WINDOWS)
 	if (::wcslen(config.textureFilter.txPath) == 0 ||
 		osal_is_absolute_path(config.textureFilter.txPath) == 0) {
 		api().GetUserDataPath(txPath);
 		gln_wcscat(txPath, wst("/hires_texture"));
 		pTexPackPath = txPath;
 	}
+#endif
 
 	wchar_t txCachePath[PLUGIN_PATH_SIZE + 16];
 	wchar_t * pTexCachePath = config.textureFilter.txCachePath;
-#if !defined(OS_LINUX)
+#if defined(OS_WINDOWS)
 	if (::wcslen(config.textureFilter.txCachePath) == 0 ||
 		osal_is_absolute_path(config.textureFilter.txCachePath) == 0) {
 		api().GetUserCachePath(txCachePath);
@@ -105,7 +107,7 @@ void TextureFilterHandler::init()
 
 	wchar_t txDumpPath[PLUGIN_PATH_SIZE + 16];
 	wchar_t * pTexDumpPath = config.textureFilter.txDumpPath;
-#if !defined(OS_LINUX)
+#if defined(OS_WINDOWS)
 	if (::wcslen(config.textureFilter.txDumpPath) == 0 ||
 		osal_is_absolute_path(config.textureFilter.txDumpPath) == 0) {
 		api().GetUserCachePath(txDumpPath);
